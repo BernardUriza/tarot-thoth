@@ -120,7 +120,7 @@ body[data-screen="spread"] .label { pointer-events: auto; }
 #reading-text { margin: 0; white-space: pre-wrap; font-size: 1.05rem; min-height: 4.5em; }
 #reading-text.typing::after { content: '▍'; color: var(--gold); animation: blink 0.8s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-#reading-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#reading-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); user-select: none; }
 #reading-note { margin-top: 12px; font-size: 0.85rem; opacity: 0.7; }
 #reading-wait { margin-top: 14px; }
 .bar { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
