@@ -1,0 +1,170 @@
+# Tarot Thoth — the rules the page plays by.
+#
+# Everything a person might want to tune without reading code lives here. The
+# runtime reads THIS file (js/rules.js); the modules under js/ only interpret it.
+
+spread:
+  # The three positions of the reading, in the order the cards are dealt.
+  # The server persona (server/prompts/tarot.md) reads past / present / future,
+  # so renaming these changes what the oracle is told each card stands for.
+  slots: [Pasado, Presente, Futuro]
+  # Longest question the page accepts. The server (server/app.py) refuses
+  # anything over 300, so keep this at or under that.
+  question_max_chars: 200
+
+oracle:
+  # The cristal.cli server (server/app.py), which carries the reading to AIRE.
+  # On localhost the page uses api_local; a page opened with ?api=<url> overrides both.
+  api: https://cristal-api.greendune-53f1f4af.eastus2.azurecontainerapps.io
+  api_local: http://localhost:8131
+  # A turn through AIRE measured 48-81 s (2026-10-04/05), so the wait needs
+  # more than one line of patter or it reads as frozen.
+  waiting_phrases:
+    - Consultando al oráculo…
+    - Abriendo el Libro de Thoth…
+    - Las cartas se acomodan…
+    - AIRE está leyendo la tirada…
+  waiting_phrase_seconds: 4.5
+  # The wait screen shows time elapsed against this, so it must be a measured
+  # number, not a hope. Re-measure and update it if AIRE gets faster or slower.
+  # Measured 2026-10-05: nothing for 47 s, then the whole reading in one piece.
+  typical_first_words_seconds: 47
+  # AIRE hands the reading over whole, so the page types it out (~180 words)
+  # instead of letting it pop in. One click skips it.
+  typewriter_seconds: 4
+  # Seconds without a single event from the server before the page gives up
+  # and reads from the book instead (with a button to ask again).
+  silence_seconds: 150
+
+# Voice, through susurro (the STT/TTS gateway) by way of the cristal.cli server.
+# The buttons only appear when that server has a susurro key.
+voice:
+  # A susurro voice name; empty uses the gateway's default.
+  name: ""
+  language: es
+  # A reading runs ~1,100 characters; the server refuses anything over 4,000.
+  max_speak_chars: 3500
+  # A dictated question stops by itself after this long.
+  max_listen_seconds: 20
+
+retrieval:
+  # Passages of the card's own section sent per card: its opening plus the one
+  # closest to the question. Three cards x (2 + meaning/number note) stays near
+  # 1,000-1,700 words of context per reading.
+  passages_per_card: 2
+  search_limit: 5
+  # A hit on the card's name or the section title says more than a hit in the body.
+  boost: { card_name: 3, section: 2 }
+  # Prefix-match only words long enough not to explode ("el" must not match "elemento").
+  prefix_min_length: 4
+  fuzzy: 0.1
+  # Spanish function words: they are in every passage, so they rank nothing.
+  stopwords: >-
+    a al ante como con de del desde donde e el en entre era es esa ese eso esta
+    este esto fue ha han hay la las le les lo los mas me mi muy ni no o para pero
+    por que se ser si sin sobre son su sus tambien un una uno y ya
+
+motion:
+  flip_seconds: 1
+  # Clicking a card that has nothing left to reveal makes it turn once around.
+  spin_seconds: 0.9
+  shuffle_seconds: 0.9
+  # Gap between one card leaving the deck and the next.
+  deal_stagger_seconds: 0.16
+  # A card cannot be turned while it is still flying to its place.
+  settle_seconds: 0.5
+  # Higher = cards snap to their place faster (exponential ease, per second).
+  ease_rate: 6
+
+layout:
+  # Pixel size of the Thoth scans embedded in the PDF and of the back art; only
+  # their proportions matter.
+  card_px: [271, 402]
+  back_px: [828, 1024]
+  card_height: 2      # world units; every other distance is relative to it
+  spacing: 1.9        # centre-to-centre distance between cards in the spread
+  min_gap: 0.15       # on a narrow screen the cards close up to this gap, to come out bigger
+  fov: 40
+  # Room the spread screen's own controls take: nav + hint above, label +
+  # caption + button below. The camera backs off until the cards fit between.
+  spread_top_px: 120
+  # 320 = two-line label (48) + caption (up to ~170 with a three-line excerpt) +
+  # button (46) + gaps and padding; at 240 the caption covered the middle card's label.
+  spread_bottom_px: 320
+  # Intro: the deck's height as a fraction of the viewport, and how far above
+  # centre it floats (the title and the question sit in the lower half).
+  intro_card_fraction: 0.36
+  intro_max_scale: 1.3
+  intro_lift_fraction: 0.15
+  # Reading: the three cards shrink into a band under the nav.
+  reading_card_fraction: 0.22
+  reading_top_px: 84
+
+effects:
+  stars: 900
+  spark_pool: 320
+  sparks_per_flip: 90
+  glow_open: 0.5
+  glow_hover: 0.35
+
+# Elemental dignity: this deck's answer to "reversed cards".
+#
+# Thoth cards are not read upside down. The Golden Dawn text Crowley worked
+# from (Book T) says: "A card has the same meaning and forces, whether right
+# side up or inverted", and: "A card is strong or weak, well-dignified or
+# ill-dignified, according to the cards which are next to it on either side."
+# The Book of Thoth itself never says "reversed"; it says "mal dignificada".
+# So nothing here is random: a card's dignity follows from its two neighbours.
+dignity:
+  elements: { fire: Fuego, water: Agua, air: Aire, earth: Tierra }
+  suits: { wands: fire, cups: water, swords: air, disks: earth }
+  # Book T: "Air and Earth are contraries as also are Fire and Water." Every
+  # other pair counts as friendly. (Modern authors split those into "friendly"
+  # and "neutral"; Book T does not, and neither do we.)
+  contraries: [[fire, water], [air, earth]]
+  # Book T only describes a card with a neighbour on BOTH sides, i.e. the
+  # middle one. For the two ends this applies its two-card rule ("if of
+  # opposite elements they mutually weaken each other") against their single
+  # neighbour — a modern adaptation. Set to `none` to judge only the middle card.
+  ends: pair
+  # Court cards count by their suit, as in Book T's own examples.
+  # Trumps: the three elemental and the twelve zodiacal ones follow their
+  # attribution and are not disputed. The seven planetary ones have no element
+  # in Book T or in Crowley; these follow the planet's rulership, the most
+  # common choice. Empress (Venus) and Fortune (Jupiter) are the contested two:
+  # Hughes-Barlow gives them water and air.
+  atu:
+    atu-00: air      # El Loco — Aire
+    atu-01: air      # El Juglar — Mercurio
+    atu-02: water    # La Suma Sacerdotisa — Luna
+    atu-03: earth    # La Emperatriz — Venus (disputada)
+    atu-04: fire     # El Emperador — Aries
+    atu-05: earth    # El Hierofante — Tauro
+    atu-06: air      # Los Amantes — Géminis
+    atu-07: water    # El Carro — Cáncer
+    atu-08: air      # El Ajuste — Libra
+    atu-09: earth    # El Ermitaño — Virgo
+    atu-10: fire     # Fortuna — Júpiter (disputada)
+    atu-11: fire     # El Deseo — Leo
+    atu-12: water    # El Colgado — Agua
+    atu-13: water    # La Muerte — Escorpio
+    atu-14: fire     # El Arte — Sagitario
+    atu-15: earth    # El Diablo — Capricornio
+    atu-16: fire     # La Torre — Marte
+    atu-17: air      # La Estrella — Acuario
+    atu-18: water    # La Luna — Piscis
+    atu-19: fire     # El Sol — Sol
+    atu-20: fire     # El Eón — Fuego
+    atu-21: earth    # El Universo — Saturno y Tierra
+  # What each verdict is called, and how brightly the card glows once the
+  # spread is complete (a multiple of effects.glow_open). Strong means louder,
+  # "for good or evil according to their nature", not better.
+  levels:
+    strong: { label: Bien dignificada y muy fuerte, glow: 1.7 }       # both neighbours of its own element
+    supported: { label: Bien dignificada, glow: 1.3 }                 # friendly neighbours
+    unaffected: { label: Sin afectar, glow: 1 }                       # its neighbours are contrary to each other and cancel out
+    # One neighbour contrary, one not. Book T contradicts itself here (its rule
+    # says "fairly strong", one of its own examples says "very weak"), so the
+    # page does not pretend to know which.
+    mixed: { label: Modificada, glow: 0.8 }
+    weakened: { label: Mal dignificada, glow: 0.35 }                  # contrary neighbours

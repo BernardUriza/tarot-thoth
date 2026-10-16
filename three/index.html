@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarot Thoth</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "minisearch": "https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/es/index.js",
+      "js-yaml": "https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs"
+  } }
+</script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body data-screen="intro">
+<nav>
+  <span class="brand">Tarot Thoth</span>
+  <ol id="steps" aria-label="Pasos de la tirada">
+    <li data-step="intro">Pregunta</li>
+    <li data-step="spread">Tirada</li>
+    <li data-step="reading">Lectura</li>
+  </ol>
+  <button id="book-toggle" class="ghost">El Libro</button>
+</nav>
+
+<!-- one label per card of the spread; js/main.js names them from rules.yml and keeps them under the cards -->
+<div id="labels">
+  <button class="label"><span class="slot"></span><span class="name"></span></button>
+  <button class="label"><span class="slot"></span><span class="name"></span></button>
+  <button class="label"><span class="slot"></span><span class="name"></span></button>
+</div>
+
+<main>
+  <section class="screen active" data-screen="intro">
+    <form id="ask" class="intro-body">
+      <h1>Tarot Thoth</h1>
+      <p id="intro-hint">Tres cartas: pasado, presente y futuro. Piensa tu pregunta.</p>
+      <input id="question" type="text" autocomplete="off"
+             aria-label="Pregunta para la tirada (opcional)" placeholder="Tu pregunta (opcional)">
+      <button id="dictate" type="button" class="ghost" hidden>Dictar la pregunta</button>
+      <button id="deal" class="cta pulse" disabled>Barajar y tirar</button>
+    </form>
+    <footer id="source"></footer>
+  </section>
+
+  <section class="screen" data-screen="spread">
+    <p id="hint">Toca cada carta para voltearla.</p>
+    <div class="spread-foot">
+      <div id="caption" class="panel" aria-live="polite"></div>
+      <button id="to-reading" class="cta pulse" hidden>Leer la tirada</button>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="reading">
+    <p id="asked" class="wide"></p>
+    <div id="reading" class="panel wide">
+      <h2>La lectura</h2>
+      <p id="reading-text" aria-hidden="true"></p>
+      <div id="reading-wait" hidden>
+        <div class="bar"><i id="reading-bar"></i></div>
+        <p id="reading-eta" class="meta"></p>
+      </div>
+      <p id="reading-status" role="status"></p>
+      <p id="reading-note" hidden></p>
+    </div>
+    <div id="drawn" class="wide" aria-label="Cartas de la tirada"></div>
+    <details class="panel wide">
+      <summary>Pasajes del Libro de Thoth usados en esta tirada</summary>
+      <div id="reading-sources"></div>
+    </details>
+    <details id="deck" class="panel wide">
+      <summary>El mazo completo, como quedó barajado</summary>
+      <p id="deck-count" class="meta"></p>
+      <div id="deck-grid"></div>
+    </details>
+    <div class="actions">
+      <button id="again" class="cta">Nueva tirada</button>
+      <button id="speak" class="ghost" hidden>Escuchar la lectura</button>
+      <button id="copy" class="ghost" hidden>Copiar lectura</button>
+      <button id="retry" class="ghost" hidden>Preguntarle otra vez a AIRE</button>
+      <button id="see-spread" class="ghost">Ver las cartas</button>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="book">
+    <h2>Consultar el Libro de Thoth</h2>
+    <form id="book-form" role="search" class="wide">
+      <input id="book-query" type="search" autocomplete="off"
+             aria-label="Buscar en el Libro de Thoth" placeholder="Busca un tema: el silencio, Babalon, el Árbol de la Vida…">
+    </form>
+    <div id="book-results" class="wide" aria-live="polite"></div>
+  </section>
+</main>
+</body>
+</html>
