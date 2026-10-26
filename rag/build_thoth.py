@@ -11,7 +11,7 @@ Outputs, under --out (default ../three/thoth):
   chunks.json   every passage of the book, tagged with card / section / page
   cards/*.jpg   the card images embedded in the PDF
 
-If ../three/thoth/cards-hd/<id>.jpg exists (see hd_gemini.mjs), deck.json points at it as
+If ../three/thoth/cards-hd/<id>.jpg exists (redrawn by hd_gemini.mjs, now retired), deck.json points at it as
 the card's `imageHd`; run this again after redrawing cards.
 
 Needs poppler's `pdftotext` and `pdfimages` on PATH. The script fails loudly

@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// RETIRED 2026-10-26: the /gemini skill is read-only (no `image`), so this script exits 2 before
+// doing anything. The 22 trumps it redrew stay in ../three/thoth/cards-hd and build_thoth.py keeps
+// using them; FOOT below remains the record of what each card must carry if they are ever redrawn
+// with another tool.
+//
 // Redraw the low-resolution card scans (271 x 402, as embedded in the PDF) in
 // high definition, one card per turn of a single Gemini chat.
 //
@@ -82,6 +87,9 @@ function redraw(card, out, chat) {
     try { return JSON.parse(error.stdout); } catch { return { ok: false, error: `${error.message} ${error.stderr ?? ''}`.trim().slice(0, 400) }; }
   }
 }
+
+console.error('hd_gemini.mjs is retired: the gemini skill is read-only since 2026-10-26 (no image generation). The existing cards-hd/ redraws stay valid.');
+process.exit(2);
 
 const flags = Object.fromEntries(process.argv.slice(2).join(' ').split('--').filter(Boolean).map((flag) => { const [key, ...value] = flag.trim().split(' '); return [key, value.join(' ') || true]; }));
 if (!flags.cards) { console.error('usage: hd_gemini.mjs --cards atu|<id,id,…> [--out dir] [--pause seconds] [--chat url]'); process.exit(2); }
